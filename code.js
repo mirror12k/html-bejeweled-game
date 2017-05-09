@@ -28,6 +28,9 @@ $(function ($) {
 	// row-filling function which creates a new box which drops into place
 	var current_fill_row = -1;
 
+	// cell dragging stores
+	var cell_drag_selected_x, cell_drag_selected_y;
+
 	// available box colors
 	var colors = [
 		'red',
@@ -50,6 +53,25 @@ $(function ($) {
 				on_cell_clicked(x,y);
 			}).bind(undefined, x, board_size_y - y - 1));
 
+			cell.mousedown((function (x, y, e) {
+				e.preventDefault();
+				e.stopPropagation();
+				console.log('mouse down: ', x,y);
+				cell_drag_selected_x = x;
+				cell_drag_selected_y = y;
+			}).bind(undefined, x, board_size_y - y - 1));
+
+			cell.mouseup((function (x, y, e) {
+				e.preventDefault();
+				e.stopPropagation();
+				if (cell_drag_selected_x !== undefined && cell_drag_selected_y !== undefined) {
+					console.log('mouse up: ', x,y);
+					on_cell_dragged(cell_drag_selected_x, cell_drag_selected_y, x, y);
+					cell_drag_selected_x = undefined;
+					cell_drag_selected_y = undefined;
+				}
+			}).bind(undefined, x, board_size_y - y - 1));
+
 			row.append(cell);
 		}
 		box.append(row);
@@ -63,6 +85,37 @@ $(function ($) {
 			return true;
 	}
 
+	function swap_adjacent_tiles (x1, y1, x2, y2) {
+		board[y2][x2].remove();
+		board[y1][x1].remove();
+
+		if (x1 !== x2) {
+			if (x1 < x2) {
+				add_animation(board[y2][x2], 'box-shift-left-80');
+				add_animation(board[y1][x1], 'box-shift-right-80');
+			} else {
+				add_animation(board[y2][x2], 'box-shift-right-80');
+				add_animation(board[y1][x1], 'box-shift-left-80');
+			}
+		} else {
+			if (y1 < y2) {
+				add_animation(board[y2][x2], 'box-shift-up-80');
+				add_animation(board[y1][x1], 'box-shift-down-80');
+			} else {
+				add_animation(board[y2][x2], 'box-shift-down-80');
+				add_animation(board[y1][x1], 'box-shift-up-80');
+			}
+		}
+
+		var swap = board[y2][x2];
+		board[y2][x2] = board[y1][x1];
+		board[y1][x1] = swap;
+
+		append_to_cell(x2, y2, board[y2][x2]);
+		append_to_cell(x1, y1, board[y1][x1]);
+
+	}
+
 	var selected_x, selected_y;
 
 	// called when a tile is clicked
@@ -71,6 +124,7 @@ $(function ($) {
 		// board[y][x].remove();
 		// board[y][x] = undefined;
 
+		// click swap tiles
 		if (selected_x === undefined) {
 			selected_x = x;
 			selected_y = y;
@@ -79,37 +133,32 @@ $(function ($) {
 			console.log('x,y: ', selected_x, selected_y, x, y);
 			console.log('distance: ', dist);
 			if (dist === 1) {
-				board[y][x].remove();
-				board[selected_y][selected_x].remove();
-
-				if (selected_x !== x) {
-					if (selected_x < x) {
-						add_animation(board[y][x], 'box-shift-left-80');
-						add_animation(board[selected_y][selected_x], 'box-shift-right-80');
-					} else {
-						add_animation(board[y][x], 'box-shift-right-80');
-						add_animation(board[selected_y][selected_x], 'box-shift-left-80');
-					}
-				} else {
-					if (selected_y < y) {
-						add_animation(board[y][x], 'box-shift-up-80');
-						add_animation(board[selected_y][selected_x], 'box-shift-down-80');
-					} else {
-						add_animation(board[y][x], 'box-shift-down-80');
-						add_animation(board[selected_y][selected_x], 'box-shift-up-80');
-					}
-				}
-
-				var swap = board[y][x];
-				board[y][x] = board[selected_y][selected_x];
-				board[selected_y][selected_x] = swap;
-
-				append_to_cell(x, y, board[y][x]);
-				append_to_cell(selected_x, selected_y, board[selected_y][selected_x]);
+				swap_adjacent_tiles(selected_x, selected_y, x, y);
 			}
 
 			selected_x = undefined;
 			selected_y = undefined;
+		}
+	}
+
+	function on_cell_dragged(from_x, from_y, to_x, to_y) {
+		var dist = Math.abs(from_x - to_x) + Math.abs(from_y - to_y);
+		if (dist === 1) {
+			swap_adjacent_tiles(from_x, from_y, to_x, to_y);
+		} else if (dist > 0) {
+			if (Math.abs(from_x - to_x) > Math.abs(from_y - to_y)) {
+				// x-plane move
+				if (from_x > to_x)
+					swap_adjacent_tiles(from_x, from_y, from_x - 1, from_y);
+				else
+					swap_adjacent_tiles(from_x, from_y, from_x + 1, from_y);
+			} else {
+				// y-plane move
+				if (from_y > to_y)
+					swap_adjacent_tiles(from_x, from_y, from_x, from_y - 1);
+				else
+					swap_adjacent_tiles(from_x, from_y, from_x, from_y + 1);
+			}
 		}
 	}
 
