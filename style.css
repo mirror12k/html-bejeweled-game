@@ -29,6 +29,11 @@ html {
 	height: 80px;
 }
 
+.box-item-container {
+	width: 80px;
+	height: 80px;
+}
+
 .box-item {
 	width: 70px;
 	height: 70px;
@@ -157,5 +162,23 @@ html {
 
 .box-item-purple {
 	background-color: #D8F;
+}
+
+
+@keyframes anim-box-item-rainbow {
+	0% { background-color: #FAA; }
+	20% { background-color: #FC8; }
+	40% { background-color: #8FA; }
+	60% { background-color: #AAF; }
+	80% { background-color: #D8F; }
+	100% { background-color: #FAA; }
+}
+
+.box-item-rainbow {
+	background-color: #D8F;
+	animation-name: anim-box-item-rainbow;
+	animation-duration: 1.5s;
+	animation-iteration-count: infinite;
+	/*animation-timing-function: linear;*/
 }
 

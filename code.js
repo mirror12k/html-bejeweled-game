@@ -39,6 +39,9 @@ $(function ($) {
 		'blue',
 		'purple',
 	];
+	var rare_colors = [
+		'rainbow',
+	];
 
 	// add proper building for the board
 	var box = $('.box');
@@ -164,11 +167,16 @@ $(function ($) {
 
 	// create a new box
 	function create_box_item () {
-		var box_item = $('<div class="box-item"></div>');
+		var box_item = $('<div class="box-item-container"><div class="box-item"></div></div>');
 
-		var box_color = colors[rand_int(0, colors.length)];
+		var box_color;
+		if (rand_int(0, 50) === 0) {
+			box_color = rare_colors[rand_int(0, rare_colors.length)];
+		} else {
+			box_color = colors[rand_int(0, colors.length)];
+		}
 		// console.log("debug box_color: " + box_color);
-		box_item.addClass('box-item-' + box_color);
+		box_item.find('.box-item').addClass('box-item-' + box_color);
 		box_item.attr('data-box-color', box_color);
 
 		return box_item;
@@ -176,8 +184,8 @@ $(function ($) {
 
 	function add_animation(item, animation) {
 		item.removeClass();
+		item.addClass('box-item-container' + ' ' + animation);
 		item.attr('data-is-animating', 'true');
-		item.addClass('box-item box-item-' + item.data('box-color') + ' ' + animation);
 		item.one("animationend", function(e) {
 			// console.log('animationend ' + animation + ' complete!');
 			item.data('is-animating', 'false');
@@ -272,27 +280,37 @@ $(function ($) {
 		for (var i = 0; i < lines.length; i++) {
 			var line_color = '';
 			var line_length = 0;
+			var line_offset = -1;
+			var line_rainbow_length = 0;
 			for (var k = 0; k < lines[i].length; k++) {
-				if (line_color !== lines[i][k] || line_color === '') {
+				if (lines[i][k] === 'rainbow') {
+					line_rainbow_length++;
+					if (line_color !== '') {
+						line_length++;
+					}
+				} else if (line_color !== lines[i][k] || line_color === '') {
 					if (line_length >= 3) {
 						segments.push({
 							'line_index': i,
-							'line_offset': k - line_length,
+							'line_offset': line_offset,
 							'line_color': line_color,
 							'line_length': line_length,
 						});
 					}
 					line_color = lines[i][k];
-					line_length = 1;
+					line_offset = k - line_rainbow_length;
+					line_length = line_rainbow_length + 1;
+					line_rainbow_length = 0;
 				} else {
 					line_length++;
+					line_rainbow_length = 0;
 				}
 			}
 
 			if (line_length >= 3) {
 				segments.push({
 					'line_index': i,
-					'line_offset': k - line_length,
+					'line_offset': line_offset,
 					'line_color': line_color,
 					'line_length': line_length,
 				});
