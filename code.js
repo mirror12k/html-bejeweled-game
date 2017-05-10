@@ -56,7 +56,7 @@ $(function ($) {
 			cell.mousedown((function (x, y, e) {
 				e.preventDefault();
 				e.stopPropagation();
-				console.log('mouse down: ', x,y);
+				// console.log('mouse down: ', x,y);
 				cell_drag_selected_x = x;
 				cell_drag_selected_y = y;
 			}).bind(undefined, x, board_size_y - y - 1));
@@ -65,7 +65,7 @@ $(function ($) {
 				e.preventDefault();
 				e.stopPropagation();
 				if (cell_drag_selected_x !== undefined && cell_drag_selected_y !== undefined) {
-					console.log('mouse up: ', x,y);
+					// console.log('mouse up: ', x,y);
 					on_cell_dragged(cell_drag_selected_x, cell_drag_selected_y, x, y);
 					cell_drag_selected_x = undefined;
 					cell_drag_selected_y = undefined;
@@ -130,8 +130,8 @@ $(function ($) {
 			selected_y = y;
 		} else {
 			var dist = Math.abs(selected_x - x) + Math.abs(selected_y - y);
-			console.log('x,y: ', selected_x, selected_y, x, y);
-			console.log('distance: ', dist);
+			// console.log('x,y: ', selected_x, selected_y, x, y);
+			// console.log('distance: ', dist);
 			if (dist === 1) {
 				swap_adjacent_tiles(selected_x, selected_y, x, y);
 			}
@@ -167,7 +167,7 @@ $(function ($) {
 		var box_item = $('<div class="box-item"></div>');
 
 		var box_color = colors[rand_int(0, colors.length)];
-		console.log("debug box_color: " + box_color);
+		// console.log("debug box_color: " + box_color);
 		box_item.addClass('box-item-' + box_color);
 		box_item.attr('data-box-color', box_color);
 
@@ -176,12 +176,25 @@ $(function ($) {
 
 	function add_animation(item, animation) {
 		item.removeClass();
+		item.attr('data-is-animating', 'true');
 		item.addClass('box-item box-item-' + item.data('box-color') + ' ' + animation);
+		item.one("animationend", function(e) {
+			// console.log('animationend ' + animation + ' complete!');
+			item.data('is-animating', 'false');
+			// console.log('is-animating: ' + item.data('is-animating'));
+		});
 	}
 
 
 	function append_to_cell(x, y, item) {
 		box.find('.box-cell-' + x + '-' + y).append(item);
+	}
+
+	function delete_cell(x, y) {
+		if (board[y][x] !== undefined) {
+			board[y][x].remove();
+			board[y][x] = undefined;
+		}
 	}
 
 	function fill_row(x) {
@@ -194,7 +207,7 @@ $(function ($) {
 		}
 		y++;
 
-		console.log("placing a new box item at ", x, y);
+		// console.log("debug placing a new box item at ", x, y);
 		var dist = (board_size_y - y) * 80;
 		board[y][x] = create_box_item();
 		add_animation(board[y][x], 'box-drop-' + dist);
@@ -204,6 +217,8 @@ $(function ($) {
 
 	// update the board by dropping down floating tiles and adding new ones where necessary
 	function update_board() {
+
+		find_y_lines();
 
 		var incomplete_rows = [];
 
@@ -246,6 +261,70 @@ $(function ($) {
 		// increment row
 		if (++current_fill_row > board_size_x) {
 			current_fill_row = 0;
+		}
+	}
+
+	function find_segments(lines) {
+		var segments = [];
+		for (var i = 0; i < lines.length; i++) {
+			var line_color = '';
+			var line_length = 0;
+			for (var k = 0; k < lines[i].length; k++) {
+				if (line_color !== lines[i][k] || line_color === '') {
+					if (line_length >= 3) {
+						segments.push({
+							'line_index': i,
+							'line_offset': k - line_length,
+							'line_color': line_color,
+							'line_length': line_length,
+						});
+					}
+					line_color = lines[i][k];
+					line_length = 1;
+				} else {
+					line_length++;
+				}
+			}
+
+			if (line_length >= 3) {
+				segments.push({
+					'line_index': i,
+					'line_offset': k - line_length,
+					'line_color': line_color,
+					'line_length': line_length,
+				});
+			}
+		}
+
+		return segments
+	}
+
+	function find_y_lines() {
+		var lines = [];
+		for (var x = 0; x < board_size_x; x++) {
+			var line_colors = [];
+			for (var y = 0; y < board_size_y; y++) {
+				if (board[y][x] !== undefined && '' + board[y][x].data('is-animating') !== 'true') {
+					// console.log('is-animating: ' + board[y][x].data('is-animating'));
+					line_colors[y] = board[y][x].data('box-color');
+				}
+				else
+					line_colors[y] = '';
+			}
+			lines[x] = line_colors;
+		}
+
+		var segments = find_segments(lines);
+		for (var i = 0; i < segments.length; i++) {
+			var seg = segments[i];
+
+			var x = seg.line_index;
+			var start_y = seg.line_offset;
+			var end_y = seg.line_offset + seg.line_length;
+
+			// console.log("debug deleting line: ", x, start_y, end_y);
+			for (var y = start_y; y < end_y; y++)
+				delete_cell(x, y);
 		}
 	}
 
