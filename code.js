@@ -218,7 +218,10 @@ $(function ($) {
 	// update the board by dropping down floating tiles and adding new ones where necessary
 	function update_board() {
 
-		find_y_lines();
+		var y_segments = find_y_segments();
+		var x_segments = find_x_segments();
+		remove_y_segments(y_segments);
+		remove_x_segments(x_segments);
 
 		var incomplete_rows = [];
 
@@ -296,10 +299,10 @@ $(function ($) {
 			}
 		}
 
-		return segments
+		return segments;
 	}
 
-	function find_y_lines() {
+	function find_y_segments() {
 		var lines = [];
 		for (var x = 0; x < board_size_x; x++) {
 			var line_colors = [];
@@ -315,6 +318,10 @@ $(function ($) {
 		}
 
 		var segments = find_segments(lines);
+		return segments;
+	}
+
+	function remove_y_segments(segments) {
 		for (var i = 0; i < segments.length; i++) {
 			var seg = segments[i];
 
@@ -324,6 +331,39 @@ $(function ($) {
 
 			// console.log("debug deleting line: ", x, start_y, end_y);
 			for (var y = start_y; y < end_y; y++)
+				delete_cell(x, y);
+		}
+	}
+
+	function find_x_segments() {
+		var lines = [];
+		for (var y = 0; y < board_size_y; y++) {
+			var line_colors = [];
+			for (var x = 0; x < board_size_x; x++) {
+				if (board[y][x] !== undefined && '' + board[y][x].data('is-animating') !== 'true') {
+					// console.log('is-animating: ' + board[y][x].data('is-animating'));
+					line_colors[x] = board[y][x].data('box-color');
+				}
+				else
+					line_colors[x] = '';
+			}
+			lines[y] = line_colors;
+		}
+
+		var segments = find_segments(lines);
+		return segments;
+	}
+
+	function remove_x_segments(segments) {
+		for (var i = 0; i < segments.length; i++) {
+			var seg = segments[i];
+
+			var y = seg.line_index;
+			var start_x = seg.line_offset;
+			var end_x = seg.line_offset + seg.line_length;
+
+			// console.log("debug deleting line: ", x, start_y, end_y);
+			for (var x = start_x; x < end_x; x++)
 				delete_cell(x, y);
 		}
 	}
