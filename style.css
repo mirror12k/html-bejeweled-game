@@ -5,8 +5,8 @@ html {
 
 .box {
 	margin: auto;
-	width: 408px;
-	height: 408px;
+	width: 648px;
+	height: 648px;
 	display: block;
 
 	border: 4px solid #444;
@@ -20,7 +20,7 @@ html {
 	display: block;
 	line-height: 0px;
 	height: 80px;
-	width: 400px;
+	width: 640px;
 }
 
 .box-cell {
@@ -46,39 +46,39 @@ html {
 
 
 
-@keyframes anim-box-shift-left-80 {
+@keyframes anim-box-shift-left {
 	from { transform: translate(80px,0); }
 	to { transform: translate(0,0); }
 }
-.box-shift-left-80 {
-	animation-name: anim-box-shift-left-80;
+.box-shift-left {
+	animation-name: anim-box-shift-left;
 	animation-duration: 0.5s;
 }
 
-@keyframes anim-box-shift-right-80 {
+@keyframes anim-box-shift-right {
 	from { transform: translate(-80px,0); }
 	to { transform: translate(0,0); }
 }
-.box-shift-right-80 {
-	animation-name: anim-box-shift-right-80;
+.box-shift-right {
+	animation-name: anim-box-shift-right;
 	animation-duration: 0.5s;
 }
 
-@keyframes anim-box-shift-up-80 {
+@keyframes anim-box-shift-up {
 	from { transform: translate(0,-80px); }
 	to { transform: translate(0,0); }
 }
-.box-shift-up-80 {
-	animation-name: anim-box-shift-up-80;
+.box-shift-up {
+	animation-name: anim-box-shift-up;
 	animation-duration: 0.5s;
 }
 
-@keyframes anim-box-shift-down-80 {
+@keyframes anim-box-shift-down {
 	from { transform: translate(0,80px); }
 	to { transform: translate(0,0); }
 }
-.box-shift-down-80 {
-	animation-name: anim-box-shift-down-80;
+.box-shift-down {
+	animation-name: anim-box-shift-down;
 	animation-duration: 0.5s;
 }
 
@@ -143,35 +143,73 @@ html {
 	/*animation-timing-function: linear;*/
 }
 
+@keyframes anim-box-drop-480 {
+	from { transform: translate(0,-480px); }
+	to { transform: translate(0,0); }
+}
+.box-drop-480 {
+	animation-name: anim-box-drop-480;
+	animation-duration: 2.5s;
+	/*animation-iteration-count: infinite;*/
+	/*animation-timing-function: linear;*/
+}
+
+@keyframes anim-box-drop-560 {
+	from { transform: translate(0,-560px); }
+	to { transform: translate(0,0); }
+}
+.box-drop-560 {
+	animation-name: anim-box-drop-560;
+	animation-duration: 2.5s;
+	/*animation-iteration-count: infinite;*/
+	/*animation-timing-function: linear;*/
+}
+
+@keyframes anim-box-drop-640 {
+	from { transform: translate(0,-640px); }
+	to { transform: translate(0,0); }
+}
+.box-drop-640 {
+	animation-name: anim-box-drop-640;
+	animation-duration: 2.5s;
+	/*animation-iteration-count: infinite;*/
+	/*animation-timing-function: linear;*/
+}
+
 
 .box-item-red {
-	background-color: #FAA;
+	background-color: #F88;
+}
+
+.box-item-orange {
+	background-color: #FC4;
 }
 
 .box-item-yellow {
-	background-color: #FC8;
+	background-color: #EF6;
 }
 
 .box-item-green {
-	background-color: #8FA;
+	background-color: #8F6;
 }
 
 .box-item-blue {
-	background-color: #AAF;
+	background-color: #88F;
 }
 
 .box-item-purple {
-	background-color: #D8F;
+	background-color: #D6F;
 }
 
 
 @keyframes anim-box-item-rainbow {
-	0% { background-color: #FAA; }
-	20% { background-color: #FC8; }
-	40% { background-color: #8FA; }
-	60% { background-color: #AAF; }
-	80% { background-color: #D8F; }
-	100% { background-color: #FAA; }
+	0% { background-color: #F88; }
+	18% { background-color: #FC4; }
+	34% { background-color: #EF6; }
+	50% { background-color: #8F6; }
+	68% { background-color: #88F; }
+	84% { background-color: #D6F; }
+	100% { background-color: #F88; }
 }
 
 .box-item-rainbow {

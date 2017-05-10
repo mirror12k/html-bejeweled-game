@@ -12,11 +12,11 @@ $(function ($) {
 	}
 
 
-
+	// settings
 
 	// initialize board
-	var board_size_x = 5;
-	var board_size_y = 5;
+	var board_size_x = 8;
+	var board_size_y = 8;
 	var board = [];
 	for (var y = 0; y < board_size_y; y++) {
 		board[y] = [];
@@ -25,15 +25,13 @@ $(function ($) {
 		}
 	}
 
-	// row-filling function which creates a new box which drops into place
-	var current_fill_row = -1;
-
-	// cell dragging stores
-	var cell_drag_selected_x, cell_drag_selected_y;
+	// how many blocks in a row are needed to create a match
+	var match_length_required = 3;
 
 	// available box colors
 	var colors = [
 		'red',
+		'orange',
 		'yellow',
 		'green',
 		'blue',
@@ -42,6 +40,11 @@ $(function ($) {
 	var rare_colors = [
 		'rainbow',
 	];
+
+
+
+
+
 
 	// add proper building for the board
 	var box = $('.box');
@@ -94,19 +97,19 @@ $(function ($) {
 
 		if (x1 !== x2) {
 			if (x1 < x2) {
-				add_animation(board[y2][x2], 'box-shift-left-80');
-				add_animation(board[y1][x1], 'box-shift-right-80');
+				add_animation(board[y2][x2], 'box-shift-left');
+				add_animation(board[y1][x1], 'box-shift-right');
 			} else {
-				add_animation(board[y2][x2], 'box-shift-right-80');
-				add_animation(board[y1][x1], 'box-shift-left-80');
+				add_animation(board[y2][x2], 'box-shift-right');
+				add_animation(board[y1][x1], 'box-shift-left');
 			}
 		} else {
 			if (y1 < y2) {
-				add_animation(board[y2][x2], 'box-shift-up-80');
-				add_animation(board[y1][x1], 'box-shift-down-80');
+				add_animation(board[y2][x2], 'box-shift-up');
+				add_animation(board[y1][x1], 'box-shift-down');
 			} else {
-				add_animation(board[y2][x2], 'box-shift-down-80');
-				add_animation(board[y1][x1], 'box-shift-up-80');
+				add_animation(board[y2][x2], 'box-shift-down');
+				add_animation(board[y1][x1], 'box-shift-up');
 			}
 		}
 
@@ -223,6 +226,9 @@ $(function ($) {
 	}
 
 
+	// row-filling function which creates a new box which drops into place
+	var current_fill_row = -1;
+
 	// update the board by dropping down floating tiles and adding new ones where necessary
 	function update_board() {
 
@@ -289,7 +295,7 @@ $(function ($) {
 						line_length++;
 					}
 				} else if (line_color !== lines[i][k] || line_color === '') {
-					if (line_length >= 3) {
+					if (line_length >= match_length_required) {
 						segments.push({
 							'line_index': i,
 							'line_offset': line_offset,
@@ -307,7 +313,7 @@ $(function ($) {
 				}
 			}
 
-			if (line_length >= 3) {
+			if (line_length >= match_length_required) {
 				segments.push({
 					'line_index': i,
 					'line_offset': line_offset,
