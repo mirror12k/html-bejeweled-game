@@ -55,9 +55,9 @@ $(function ($) {
 			var cell = $('<div class="box-cell box-cell-' + x + '-' + (board_size_y - y - 1)
 					+ '" data-cell-x="' + x + '" data-cell-y="' + (board_size_y - y - 1) + '"></div>');
 
-			cell.click((function (x, y, e) {
-				on_cell_clicked(x,y);
-			}).bind(undefined, x, board_size_y - y - 1));
+			// cell.click((function (x, y, e) {
+			// 	on_cell_clicked(x,y);
+			// }).bind(undefined, x, board_size_y - y - 1));
 
 			cell.mousedown((function (x, y, e) {
 				e.preventDefault();
@@ -149,21 +149,106 @@ $(function ($) {
 
 	function on_cell_dragged(from_x, from_y, to_x, to_y) {
 		var dist = Math.abs(from_x - to_x) + Math.abs(from_y - to_y);
-		if (dist === 1) {
-			swap_adjacent_tiles(from_x, from_y, to_x, to_y);
-		} else if (dist > 0) {
+		// if (dist === 1) {
+		// 	swap_adjacent_tiles(from_x, from_y, to_x, to_y);
+		// } else 
+		if (dist > 0) {
 			if (Math.abs(from_x - to_x) > Math.abs(from_y - to_y)) {
 				// x-plane move
 				if (from_x > to_x)
-					swap_adjacent_tiles(from_x, from_y, from_x - 1, from_y);
+					rotate_row(from_y, 'left');
+					// swap_adjacent_tiles(from_x, from_y, from_x - 1, from_y);
 				else
-					swap_adjacent_tiles(from_x, from_y, from_x + 1, from_y);
+					rotate_row(from_y, 'right');
+					// swap_adjacent_tiles(from_x, from_y, from_x + 1, from_y);
 			} else {
 				// y-plane move
 				if (from_y > to_y)
-					swap_adjacent_tiles(from_x, from_y, from_x, from_y - 1);
+					rotate_column(from_x, 'up');
+					// swap_adjacent_tiles(from_x, from_y, from_x, from_y - 1);
 				else
-					swap_adjacent_tiles(from_x, from_y, from_x, from_y + 1);
+					rotate_column(from_x, 'down');
+					// swap_adjacent_tiles(from_x, from_y, from_x, from_y + 1);
+			}
+		}
+	}
+
+	function rotate_row(y, direction) {
+		if (direction == 'right') {
+			var swap = undefined;
+			for (var x = 0; x < board_size_x; x++) {
+				if (board[y][x] !== undefined)
+					board[y][x].remove();
+				var store = board[y][x];
+				board[y][x] = swap;
+				swap = store;	
+			}
+			board[y][0] = swap;
+
+			for (var x = 0; x < board_size_x; x++) {
+				if (board[y][x] !== undefined)
+				{
+					add_animation(board[y][x], 'box-shift-right');
+					append_to_cell(x, y, board[y][x]);
+				}
+			}
+		} else {
+			var swap = undefined;
+			for (var x = board_size_x - 1; x >= 0; x--) {
+				if (board[y][x] !== undefined)
+					board[y][x].remove();
+				var store = board[y][x];
+				board[y][x] = swap;
+				swap = store;	
+			}
+			board[y][board_size_x - 1] = swap;
+
+			for (var x = 0; x < board_size_x; x++) {
+				if (board[y][x] !== undefined)
+				{
+					add_animation(board[y][x], 'box-shift-left');
+					append_to_cell(x, y, board[y][x]);
+				}
+			}
+		}
+	}
+
+	function rotate_column(x, direction) {
+		if (direction == 'down') {
+			var swap = undefined;
+			for (var y = 0; y < board_size_y; y++) {
+				if (board[y][x] !== undefined)
+					board[y][x].remove();
+				var store = board[y][x];
+				board[y][x] = swap;
+				swap = store;	
+			}
+			board[0][x] = swap;
+
+			for (var y = 0; y < board_size_y; y++) {
+				if (board[y][x] !== undefined)
+				{
+					add_animation(board[y][x], 'box-shift-down');
+					append_to_cell(x, y, board[y][x]);
+				}
+			}
+		} else {
+			var swap = undefined;
+			for (var y = board_size_y - 1; y >= 0; y--) {
+				if (board[y][x] !== undefined)
+					board[y][x].remove();
+				var store = board[y][x];
+				board[y][x] = swap;
+				swap = store;	
+			}
+			board[board_size_y - 1][x] = swap;
+
+			for (var y = 0; y < board_size_y; y++) {
+				if (board[y][x] !== undefined)
+				{
+					add_animation(board[y][x], 'box-shift-up');
+					append_to_cell(x, y, board[y][x]);
+				}
 			}
 		}
 	}
